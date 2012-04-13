@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChildApplication.cs" />
     <Compile Include="WindowAnimation.cs" />
     <Compile Include="GlobalHotKeys.cs" />
     <Compile Include="Main.cs">

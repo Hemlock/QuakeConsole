@@ -55,7 +55,7 @@ namespace QuakeConsole
         /// Animates a window.
         /// </summary>
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern int AnimateWindow(IntPtr hwand, int dwTime, int dwFlags);
+        static extern int AnimateWindow(IntPtr hwand, int dwTime, int dwFlags);
 
         public static void SlideOut(Form form)
         {
@@ -66,5 +66,16 @@ namespace QuakeConsole
         {
             AnimateWindow(form.Handle, 200, AW_SLIDE | AW_VER_POSITIVE);
         }
+
+        public static void FadeIn(Form form)
+        {
+            AnimateWindow(form.Handle, 200, AW_CENTER);
+        }
+     
+        public static void FadeOut(Form form)
+        {
+            AnimateWindow(form.Handle, 200, AW_CENTER | AW_HIDE);
+        }
     }
+
 }
