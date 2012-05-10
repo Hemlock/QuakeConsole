@@ -46,8 +46,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChildApplication.cs" />
-    <Compile Include="WindowAnimation.cs" />
+    <Compile Include="ConsoleColumn.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ConsoleRow.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ConsoleContainer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="QuakeTerminal.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="SlidingForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="GlobalHotKeys.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>

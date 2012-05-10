@@ -9,49 +9,33 @@ using System.Windows.Forms;
 
 namespace QuakeConsole
 {
-    public partial class Main : Form
+    public partial class Main : SlidingForm
     {
-
-
-
-
-        private GlobalHotKeys hotkeys;
-        private bool visible;
-        private ChildApplication console;
-        private const int WM_PRINT = 0x0317;
-        private const int WM_PRINTCLIENT = 0x0318;
+        private GlobalHotKeys HotKeys;
         public Main()
         {
-            visible = true;
-            hotkeys = new GlobalHotKeys();
-            hotkeys.Register(Keys.Oemtilde, Modifiers.Ctrl, () => this.Toggle() );
+            HotKeys = new GlobalHotKeys();
+            HotKeys.Register(Keys.Oemtilde, Modifiers.Ctrl, () => this.Toggle() );
                 
             InitializeComponent();
             Height = 500;
             Width = Screen.PrimaryScreen.Bounds.Width;
 
-            StartConsole();
+            var column = new ConsoleColumn();
+            column.Dock = DockStyle.Fill;
+            Controls.Add(column);            
         }
 
         private void Toggle()
         {
-            if (visible)
+            if (!Visible || Sliding)
             {
-                WindowAnimation.FadeOut(this);
+                SlideIn();
             }
             else
             {
-                WindowAnimation.FadeIn(this);
+                SlideOut();
             }
-            visible = !visible;
-            console.SizeToParent();
         }
-
-        private void StartConsole()
-        {
-            console = new ChildApplication("c:\\console2\\console.exe", this);
-            console.Launch();
-        }
-
     }
 }
