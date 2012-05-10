@@ -12,6 +12,13 @@ namespace QuakeConsole
         public ConsoleColumn() : base(ConsoleContainer.Alignment.Vertical)
         {
             Add(new ConsoleRow());
+            Add(new ConsoleRow());
+        }
+
+        public void Add(ConsoleContainer row)
+        {
+            base.Add(row);
+            row.Empty += (object sender, EventArgs e) => Remove((Control)sender);
         }
     }
 }

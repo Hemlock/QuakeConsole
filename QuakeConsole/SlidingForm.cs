@@ -26,7 +26,7 @@ namespace QuakeConsole
             int time = AnimationCompleteAt - Now;
             int interval = AnimationTimer.Interval;
             int steps = (int)(time / interval);
-            if (steps == 1) 
+            if (steps <= 1) 
             {
                 Top = Goal;
                 AnimationTimer.Enabled = false;

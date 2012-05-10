@@ -15,7 +15,7 @@ namespace QuakeConsole
         public Main()
         {
             HotKeys = new GlobalHotKeys();
-            HotKeys.Register(Keys.Oemtilde, Modifiers.Ctrl, () => this.Toggle() );
+            HotKeys.Register(Keys.Oemtilde, Modifiers.Ctrl, this.Toggle);
                 
             InitializeComponent();
             Height = 500;
@@ -23,7 +23,24 @@ namespace QuakeConsole
 
             var column = new ConsoleColumn();
             column.Dock = DockStyle.Fill;
+            column.Empty += (object sender, EventArgs e) => Application.Exit();
             Controls.Add(column);            
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == (Keys.Control | Keys.Shift | Keys.E))
+            {
+                MessageBox.Show("C+S+e");
+                return true;
+            }
+            else if (keyData == (Keys.Control | Keys.Shift | Keys.O))
+            {
+                MessageBox.Show("C+S+o");
+                return true;
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
         }
 
         private void Toggle()

@@ -19,27 +19,6 @@ namespace QuakeConsole
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall, EntryPoint = "SetWindowLong")]
         static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
 
-        [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall, EntryPoint = "DestroyWindow")]
-        static extern IntPtr DestroyWindow(IntPtr hWnd);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall, EntryPoint = "SetLayeredWindowAttributes")]
-        static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
-
-
-        //PInvoke declarations
-        [DllImport("user32.dll", EntryPoint = "CreateWindowEx", CharSet = CharSet.Auto)]
-        internal static extern IntPtr CreateWindowEx(int dwExStyle,
-        string lpszClassName,
-        string lpszWindowName,
-        int style,
-        int x, int y,
-        int width, int height,
-        IntPtr hwndParent,
-        IntPtr hMenu,
-        IntPtr hInst,
-        [MarshalAs(UnmanagedType.AsAny)] object pvParam);
-
-
         readonly IntPtr HWND_BOTTOM = new IntPtr(1);
         readonly IntPtr HWND_NOTOPMOST = new IntPtr(-2);
         readonly IntPtr HWND_TOP = new IntPtr(0);
@@ -100,18 +79,28 @@ namespace QuakeConsole
         WS_BORDER = 0x00800000;
 
         Process TerminalProcess;
-
+        public event EventHandler TerminalExited;
         public QuakeTerminal() : base()
         {
             Dock = DockStyle.Fill;
+            Margin = new Padding(0);
             Start();
             Style();
             Redraw();
 
             Resize += (object sender, EventArgs e) => Redraw();
             VisibleChanged += (object sender, EventArgs e) => Redraw();
+            Application.ApplicationExit += (object sender, EventArgs e) => Cleanup();
         }
 
+        private void Cleanup()
+        {
+            if (!TerminalProcess.HasExited)
+            {
+                TerminalProcess.Close();
+                TerminalProcess.WaitForExit(1000);
+            }
+        }
         
         private void Start()
         {
@@ -121,6 +110,8 @@ namespace QuakeConsole
             startInfo.LoadUserProfile = true;
             TerminalProcess = Process.Start(startInfo);
             TerminalProcess.EnableRaisingEvents = true;
+            TerminalProcess.Exited +=
+                (object sender, EventArgs e) => this.Invoke(new MethodInvoker(delegate { TerminalExited(this, e); }));
             TerminalProcess.WaitForInputIdle();
         }
 
@@ -132,12 +123,13 @@ namespace QuakeConsole
 
             var exstyle = new IntPtr(WS_EX_LAYERED);
             SetWindowLongPtr(ChildHandle, GWL_EXSTYLE, exstyle);
-            SetLayeredWindowAttributes(ChildHandle, 0, 28, LWA_ALPHA);
         }
 
         private void Redraw()
         {
-            MoveWindow(ChildHandle, 0, 0, (int)this.Width, (int)this.Height, 1);
+            MoveWindow(ChildHandle, Margin.Left, Margin.Top, 
+                this.Width - (Margin.Left + Margin.Right), 
+                this.Height - (Margin.Top + Margin.Bottom), 1);
         }
 
         private IntPtr ChildHandle
@@ -146,6 +138,13 @@ namespace QuakeConsole
             {
                 return (IntPtr)TerminalProcess.MainWindowHandle;
             }
+        }
+
+        private void InitializeComponent()
+        {
+            this.SuspendLayout();
+            this.ResumeLayout(false);
+
         }
     }
 }
