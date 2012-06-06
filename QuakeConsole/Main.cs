@@ -53,7 +53,6 @@ namespace QuakeConsole
 
         void OnTerminalFocused(object sender, EventArgs e)
         {
-            Debug.WriteLine(sender);
             FocusedTerminal = (QuakeTerminal)sender;
             EnableOrDisableTerminalHotKeys(true);
             LastFocusedTerminal = FocusedTerminal;
@@ -117,7 +116,7 @@ namespace QuakeConsole
                 container.Panel1.Controls.Add(FocusedTerminal);
                 var terminal = CreateNewTerminal();
                 container.Panel2.Controls.Add(terminal);
-                terminal.FocusTerminal();               
+                terminal.FocusTerminal();
             }
         }
 

@@ -120,7 +120,6 @@ namespace QuakeConsole
             VisibleChanged += (object sender, EventArgs e) => Redraw();
             Application.ApplicationExit += (object sender, EventArgs e) => Cleanup();
 
-
             // setup up the hook to watch for all EVENT_SYSTEM_FOREGROUND events system wide
             WindowsEventDelegate = new WinEventDelegate(WinEventProc);
             WindowsEventHook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, 
@@ -149,11 +148,9 @@ namespace QuakeConsole
             TerminalProcess.WaitForInputIdle();
         }
         
-        public bool FocusTerminal()
+        public void FocusTerminal()
         {
-            var handle = ChildHandle;
-            return (handle != null 
-                && GetForegroundWindow() != handle && !SetForegroundWindow(handle));
+            SetForegroundWindow(ChildHandle);
         }
 
         public void ExitTerminal()
@@ -163,7 +160,6 @@ namespace QuakeConsole
                 TerminalProcess.CloseMainWindow();
                 TerminalProcess.WaitForExit(1000);
             }
-            // TODO: move the focus
         }
         
         private void TerminalExited()
@@ -209,18 +205,22 @@ namespace QuakeConsole
             // then bring the supperputty window to the foreground
             if (eventType == EVENT_SYSTEM_FOREGROUND)
             {
-                if (hwnd == ChildHandle)
-                {
-                    HasFocus = true;
-                    BackColor = System.Drawing.Color.Crimson;
-                    TerminalFocused(this, new EventArgs());
-                }
-                else
-                {
-                    HasFocus = false;
-                    BackColor = System.Drawing.Color.DarkGray;
-                    TerminalBlurred(this, new EventArgs());
-                }
+                SetHasFocus(hwnd == ChildHandle);
+            }
+        }
+
+        public void SetHasFocus(bool hasFocus)
+        {
+            HasFocus = hasFocus;
+            if (hasFocus)
+            {
+                BackColor = System.Drawing.Color.Crimson;
+                TerminalFocused(this, new EventArgs());
+            }
+            else
+            {
+                BackColor = System.Drawing.Color.DarkGray;
+                TerminalBlurred(this, new EventArgs());
             }
         }
 
