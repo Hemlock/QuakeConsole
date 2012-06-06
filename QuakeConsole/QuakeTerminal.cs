@@ -19,6 +19,15 @@ namespace QuakeConsole
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall, EntryPoint = "SetWindowLong")]
         static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
 
+        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+        public static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr SetWinEventHook(uint eventMin, uint eventMax, IntPtr hmodWinEventProc, WinEventDelegate lpfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
+
         readonly IntPtr HWND_BOTTOM = new IntPtr(1);
         readonly IntPtr HWND_NOTOPMOST = new IntPtr(-2);
         readonly IntPtr HWND_TOP = new IntPtr(0);
@@ -60,30 +69,49 @@ namespace QuakeConsole
             WS_MINIMIZEBOX = 0x00020000L,
             WS_MAXIMIZEBOX = 0x00010000L
         }
-        const int GWL_STYLE = -16;
-        const int GWL_EXSTYLE = -20;
-        const int WS_EX_LAYERED = 0x80000;
-        const int LWA_ALPHA = 0x2;
+
+        const int 
+            GWL_STYLE = -16,
+            GWL_EXSTYLE = -20,
+            WS_EX_LAYERED = 0x80000,
+            LWA_ALPHA = 0x2;
 
 
-        private IntPtr GEHrender = (IntPtr)0;
-        private IntPtr GEParentHrender = (IntPtr)0;
+        private IntPtr 
+            GEHrender = (IntPtr)0,
+            GEParentHrender = (IntPtr)0;
 
         internal const int
-        WS_CHILD = 0x40000000,
-        WS_VISIBLE = 0x10000000,
-        LBS_NOTIFY = 0x00000001,
-        HOST_ID = 0x00000002,
-        LISTBOX_ID = 0x00000001,
-        WS_VSCROLL = 0x00200000,
-        WS_BORDER = 0x00800000;
+            WS_CHILD = 0x40000000,
+            WS_VISIBLE = 0x10000000,
+            LBS_NOTIFY = 0x00000001,
+            HOST_ID = 0x00000002,
+            LISTBOX_ID = 0x00000001,
+            WS_VSCROLL = 0x00200000,
+            WS_BORDER = 0x00800000;
+
+        public const uint 
+            EVENT_SYSTEM_FOREGROUND = 3,
+            EVENT_OBJECT_NAMECHANGE = 0x800C,
+            WINEVENT_OUTOFCONTEXT = 0;
+
 
         Process TerminalProcess;
-        public event EventHandler TerminalExited;
+        public event EventHandler 
+            TerminalBlurred,
+            TerminalFocused;
+
+        public bool HasFocus = false;
+
+        public delegate void WinEventDelegate(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime);
+        WinEventDelegate WindowsEventDelegate;
+        IntPtr WindowsEventHook;
+
         public QuakeTerminal() : base()
         {
             Dock = DockStyle.Fill;
-            Margin = new Padding(0);
+            Margin = new Padding(2);
+            BackColor = System.Drawing.Color.DarkGray;
             Start();
             Style();
             Redraw();
@@ -91,6 +119,12 @@ namespace QuakeConsole
             Resize += (object sender, EventArgs e) => Redraw();
             VisibleChanged += (object sender, EventArgs e) => Redraw();
             Application.ApplicationExit += (object sender, EventArgs e) => Cleanup();
+
+
+            // setup up the hook to watch for all EVENT_SYSTEM_FOREGROUND events system wide
+            WindowsEventDelegate = new WinEventDelegate(WinEventProc);
+            WindowsEventHook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, 
+                IntPtr.Zero, WindowsEventDelegate, 0, 0, WINEVENT_OUTOFCONTEXT);
         }
 
         private void Cleanup()
@@ -111,8 +145,30 @@ namespace QuakeConsole
             TerminalProcess = Process.Start(startInfo);
             TerminalProcess.EnableRaisingEvents = true;
             TerminalProcess.Exited +=
-                (object sender, EventArgs e) => this.Invoke(new MethodInvoker(delegate { TerminalExited(this, e); }));
+                (object sender, EventArgs e) => this.Invoke(new MethodInvoker(delegate { TerminalExited(); }));
             TerminalProcess.WaitForInputIdle();
+        }
+        
+        public bool FocusTerminal()
+        {
+            var handle = ChildHandle;
+            return (handle != null 
+                && GetForegroundWindow() != handle && !SetForegroundWindow(handle));
+        }
+
+        public void ExitTerminal()
+        {
+            if (!TerminalProcess.HasExited)
+            {
+                TerminalProcess.CloseMainWindow();
+                TerminalProcess.WaitForExit(1000);
+            }
+            // TODO: move the focus
+        }
+        
+        private void TerminalExited()
+        {
+            Parent.Controls.Remove(this);
         }
 
         private void Style()
@@ -146,5 +202,27 @@ namespace QuakeConsole
             this.ResumeLayout(false);
 
         }
+
+        void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
+        {
+            // if we got the EVENT_SYSTEM_FOREGROUND, and the hwnd is the putty terminal hwnd (m_AppWin)
+            // then bring the supperputty window to the foreground
+            if (eventType == EVENT_SYSTEM_FOREGROUND)
+            {
+                if (hwnd == ChildHandle)
+                {
+                    HasFocus = true;
+                    BackColor = System.Drawing.Color.Crimson;
+                    TerminalFocused(this, new EventArgs());
+                }
+                else
+                {
+                    HasFocus = false;
+                    BackColor = System.Drawing.Color.DarkGray;
+                    TerminalBlurred(this, new EventArgs());
+                }
+            }
+        }
+
     }
 }

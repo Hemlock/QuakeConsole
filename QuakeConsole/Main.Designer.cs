@@ -41,11 +41,17 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Form1";
+            this.Shown += new System.EventHandler(this.OnShown);
+            this.VisibleChanged += new System.EventHandler(this.OnVisibleChange);
             this.ResumeLayout(false);
 
         }
 
         #endregion
+
+
+
+
 
 
 

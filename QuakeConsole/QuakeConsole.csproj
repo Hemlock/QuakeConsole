@@ -46,16 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConsoleColumn.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="ConsoleRow.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="ConsoleContainer.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="ConsoleSplitter.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="QuakeTerminal.cs">
@@ -85,9 +76,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="QuakeTerminal.resx">
-      <DependentUpon>QuakeTerminal.cs</DependentUpon>
-    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

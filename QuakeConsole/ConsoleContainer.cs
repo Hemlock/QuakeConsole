@@ -7,79 +7,30 @@ using System.Diagnostics;
 
 namespace QuakeConsole
 {
-    class ConsoleContainer : Panel
+    class ConsoleContainer : SplitContainer
     {
-        public enum Alignment 
+        public ConsoleContainer(Orientation orientation) : base()
         {
-            Vertical,
-            Horizontal
-        }
-        public event EventHandler Empty;
+            Panel1.ControlRemoved += new ControlEventHandler(TerminalRemoved);
+            Panel2.ControlRemoved += new ControlEventHandler(TerminalRemoved);
+            Dock = DockStyle.Fill;
 
-        private Alignment ChildAlignment;
-        public ConsoleContainer(Alignment alignment)
-        {
-            ChildAlignment = alignment;
+            Orientation = orientation;
+            var size = Orientation == Orientation.Horizontal ? Height : Width;
+            SplitterDistance = (int)(size / 2);
         }
 
-        public void Add(Control child)
+        void TerminalRemoved(object sender, ControlEventArgs e)
         {
-            if (Controls.Count == 0)
+            var count = Panel1.Controls.Count + Panel2.Controls.Count;
+            if (count == 1)
             {
-                child.Dock = DockStyle.Fill;
-            }
-            else
-            {
-                var dock = ChildAlignment == Alignment.Horizontal
-                    ? DockStyle.Left
-                    : DockStyle.Top;
-
-                child.Dock = dock;
-                var splitter = new ConsoleSplitter();
-                splitter.Dock = dock;
-                Controls.Add(splitter);
-            }
-            Controls.Add(child);
-        }
-
-
-        public void Remove(Control child)
-        {
-            Controls.Remove(child);
-
-            if (Controls.Count > 0)
-            {
-                if (Controls[0] is ConsoleSplitter)
-                {
-                    Controls.RemoveAt(0);
-                }
-                else if (Controls[Controls.Count - 1] is ConsoleSplitter)
-                {
-                    Controls.RemoveAt(Controls.Count - 1);
-                }
-                else
-                {
-                    Control prev = null;
-                    foreach (Control control in Controls)
-                    {
-                        if (control is ConsoleSplitter && prev is ConsoleSplitter)
-                        {
-                            Controls.Remove(control);
-                            break;
-                        }
-                        prev = control;
-                    }
-                }
-            }
-
-            if (Controls.Count == 0)
-            {
-                Empty(this, new EventArgs());
-            }
-            else 
-            {
-                Controls[0].Dock = DockStyle.Fill;
-            }
+                var panel = Panel1.Controls.Count == 1 ? Panel1 : Panel2;
+                var terminal = panel.Controls[0];
+                panel.Controls.RemoveAt(0);
+                Parent.Controls.Add(terminal);
+                Parent.Controls.Remove(this);
+            }               
         }
     }
 }
