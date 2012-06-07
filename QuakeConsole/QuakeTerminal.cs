@@ -5,10 +5,11 @@ using System.Text;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using System.Drawing;
 
 namespace QuakeConsole
 {
-    class QuakeTerminal : Panel
+    class QuakeTerminal : CaptionPanel
     {
         [DllImport("user32.dll")]
         static extern int SetParent(IntPtr hWndChild, int hWndParent);
@@ -27,6 +28,12 @@ namespace QuakeConsole
 
         [DllImport("user32.dll")]
         public static extern IntPtr SetWinEventHook(uint eventMin, uint eventMax, IntPtr hmodWinEventProc, WinEventDelegate lpfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern int GetWindowTextLength(HandleRef hWnd);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern int GetWindowText(HandleRef hWnd, StringBuilder lpString, int nMaxCount);
 
         readonly IntPtr HWND_BOTTOM = new IntPtr(1);
         readonly IntPtr HWND_NOTOPMOST = new IntPtr(-2);
@@ -110,19 +117,17 @@ namespace QuakeConsole
         public QuakeTerminal() : base()
         {
             Dock = DockStyle.Fill;
-            Margin = new Padding(2);
-            BackColor = System.Drawing.Color.DarkGray;
             Start();
             Style();
             Redraw();
-
+            Margin = new Padding(0);
             Resize += (object sender, EventArgs e) => Redraw();
             VisibleChanged += (object sender, EventArgs e) => Redraw();
             Application.ApplicationExit += (object sender, EventArgs e) => Cleanup();
 
             // setup up the hook to watch for all EVENT_SYSTEM_FOREGROUND events system wide
             WindowsEventDelegate = new WinEventDelegate(WinEventProc);
-            WindowsEventHook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, 
+            WindowsEventHook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_OBJECT_NAMECHANGE, 
                 IntPtr.Zero, WindowsEventDelegate, 0, 0, WINEVENT_OUTOFCONTEXT);
         }
 
@@ -137,7 +142,7 @@ namespace QuakeConsole
         
         private void Start()
         {
-            var startInfo = new ProcessStartInfo("c:\\cygwin\\bin\\mintty.exe");
+            var startInfo = new ProcessStartInfo(Properties.Settings.Default.Executable);
             startInfo.Arguments = " - ";
             startInfo.WorkingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             startInfo.LoadUserProfile = true;
@@ -179,9 +184,9 @@ namespace QuakeConsole
 
         private void Redraw()
         {
-            MoveWindow(ChildHandle, Margin.Left, Margin.Top, 
-                this.Width - (Margin.Left + Margin.Right), 
-                this.Height - (Margin.Top + Margin.Bottom), 1);
+            MoveWindow(ChildHandle, Margin.Left + Padding.Left, Margin.Top + Padding.Top,  
+                ClientSize.Width - (Margin.Left + Padding.Left + Margin.Right + Padding.Right), 
+                ClientSize.Height - (Margin.Top + Padding.Top + Margin.Bottom + Padding.Bottom), 1);
         }
 
         private IntPtr ChildHandle
@@ -203,23 +208,40 @@ namespace QuakeConsole
         {
             // if we got the EVENT_SYSTEM_FOREGROUND, and the hwnd is the putty terminal hwnd (m_AppWin)
             // then bring the supperputty window to the foreground
+            bool isThis = (hwnd == ChildHandle);
             if (eventType == EVENT_SYSTEM_FOREGROUND)
             {
-                SetHasFocus(hwnd == ChildHandle);
+                SetHasFocus(isThis);
             }
+            else if (isThis && eventType == EVENT_OBJECT_NAMECHANGE)
+            {
+                SetCaptionFromTerminal();     
+            }
+        }
+
+        private void SetCaptionFromTerminal()
+        {
+            int capacity = GetWindowTextLength(new HandleRef(this, ChildHandle)) * 2;
+            StringBuilder stringBuilder = new StringBuilder(capacity);
+            GetWindowText(new HandleRef(this, ChildHandle), stringBuilder, stringBuilder.Capacity);
+            Caption = stringBuilder.ToString();
         }
 
         public void SetHasFocus(bool hasFocus)
         {
             HasFocus = hasFocus;
+            var settings = Properties.Settings.Default;
             if (hasFocus)
             {
-                BackColor = System.Drawing.Color.Crimson;
+
+                BackColor = ColorTranslator.FromHtml(settings.FocusedCaptionBackgroundColor);
+                CaptionColor = ColorTranslator.FromHtml(settings.FocusedCaptionColor);
                 TerminalFocused(this, new EventArgs());
             }
             else
             {
-                BackColor = System.Drawing.Color.DarkGray;
+                BackColor = ColorTranslator.FromHtml(settings.CaptionBackgroundColor);
+                CaptionColor = ColorTranslator.FromHtml(settings.CaptionColor);
                 TerminalBlurred(this, new EventArgs());
             }
         }

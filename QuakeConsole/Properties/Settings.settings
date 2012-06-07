@@ -1,7 +1,21 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="QuakeConsole.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Executable" Type="System.String" Scope="User">
+      <Value Profile="(Default)">c:\cygwin\bin\mintty.exe</Value>
+    </Setting>
+    <Setting Name="FocusedCaptionColor" Type="System.String" Scope="User">
+      <Value Profile="(Default)">#ffffff</Value>
+    </Setting>
+    <Setting Name="CaptionColor" Type="System.String" Scope="User">
+      <Value Profile="(Default)">#000000</Value>
+    </Setting>
+    <Setting Name="FocusedCaptionBackgroundColor" Type="System.String" Scope="User">
+      <Value Profile="(Default)">#3333ff</Value>
+    </Setting>
+    <Setting Name="CaptionBackgroundColor" Type="System.String" Scope="User">
+      <Value Profile="(Default)">#aaaaaa</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>
