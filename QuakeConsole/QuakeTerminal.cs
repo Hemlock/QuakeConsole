@@ -158,8 +158,10 @@ namespace QuakeConsole
         
         public void FocusTerminal()
         {
+            Debug.WriteLine("Focus Terminal");
             if (GetForegroundWindow() != ChildHandle)
             {
+                Debug.WriteLine("Setting Focus");
                 SetForegroundWindow(ChildHandle);
             }
             HasFocus = true;
@@ -223,7 +225,7 @@ namespace QuakeConsole
             bool isThis = (hwnd == ChildHandle);
             if (eventType == EVENT_SYSTEM_FOREGROUND)
             {
-                HasFocus = isThis;
+                HasFocus = (GetForegroundWindow() == ChildHandle);
             }
             else if (isThis && eventType == EVENT_OBJECT_NAMECHANGE)
             {
@@ -248,18 +250,19 @@ namespace QuakeConsole
 
             set
             {
+                Debug.WriteLine("HasFocus: {0} => {1}", _HasFocus, value);
                 _HasFocus = value;
                 var settings = Properties.Settings.Default;
                 var e = new EventArgs();
                 if (value)
                 {
-                    TerminalFocused(this, e);
+                    if (TerminalFocused != null) TerminalFocused(this, e);
                     BackColor = ColorTranslator.FromHtml(settings.FocusedCaptionBackgroundColor);
                     CaptionColor = ColorTranslator.FromHtml(settings.FocusedCaptionColor);
                 }
                 else
                 {
-                    TerminalBlurred(this, e);
+                    if (TerminalBlurred != null) TerminalBlurred(this, e);
                     BackColor = ColorTranslator.FromHtml(settings.CaptionBackgroundColor);
                     CaptionColor = ColorTranslator.FromHtml(settings.CaptionColor);
                 }
