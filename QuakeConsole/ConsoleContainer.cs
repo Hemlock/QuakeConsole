@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace QuakeConsole
 {
-    class ConsoleContainer : SplitContainer
+    class ConsoleContainer : SplitContainer, FocusableTerminal
     {
         public ConsoleContainer(Orientation orientation) : base()
         {
@@ -26,12 +26,18 @@ namespace QuakeConsole
             if (count == 1)
             {
                 var panel = Panel1.Controls.Count == 1 ? Panel1 : Panel2;
-                var terminal = (QuakeTerminal) panel.Controls[0];
+                var terminal = (FocusableTerminal) panel.Controls[0];
                 panel.Controls.RemoveAt(0);
-                Parent.Controls.Add(terminal);
+                Parent.Controls.Add((Control)terminal);
                 terminal.FocusTerminal();
                 Parent.Controls.Remove(this);
             }               
+        }
+
+        public void FocusTerminal()
+        {
+            var terminal = (QuakeTerminal)Panel1.Controls[0];
+            terminal.FocusTerminal();
         }
     }
 }

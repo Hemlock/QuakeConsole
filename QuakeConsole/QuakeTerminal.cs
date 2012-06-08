@@ -9,7 +9,7 @@ using System.Drawing;
 
 namespace QuakeConsole
 {
-    class QuakeTerminal : CaptionPanel
+    class QuakeTerminal : CaptionPanel, FocusableTerminal
     {
         [DllImport("user32.dll")]
         static extern int SetParent(IntPtr hWndChild, int hWndParent);

@@ -70,6 +70,7 @@
     <Compile Include="ConsoleContainer.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="FocusableTerminal.cs" />
     <Compile Include="QuakeTerminal.cs">
       <SubType>Component</SubType>
     </Compile>
