@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
+using System.Windows.Forms.VisualStyles;
 
 namespace QuakeConsole
 {
@@ -22,16 +23,18 @@ namespace QuakeConsole
         {
             HotKeys = new GlobalHotKeys();
             HotKeys.Register(Keys.Oemtilde, Modifiers.Ctrl, this.Toggle, true);
+            var ctrlShift = Modifiers.Ctrl | Modifiers.Shift;
             TerminalHotKeys = new GlobalHotKey[] { 
-                HotKeys.Register(Keys.E, Modifiers.Ctrl | Modifiers.Shift, this.SplitTerminalHorizontally),
-                HotKeys.Register(Keys.O, Modifiers.Ctrl | Modifiers.Shift, this.SplitTerminalVertically),
-                HotKeys.Register(Keys.W, Modifiers.Ctrl | Modifiers.Shift, this.CloseTerminal) 
+                HotKeys.Register(Keys.E, ctrlShift, SplitTerminalHorizontally),
+                HotKeys.Register(Keys.O, ctrlShift, SplitTerminalVertically),
+                HotKeys.Register(Keys.W, ctrlShift, CloseTerminal)
             };
     
             InitializeComponent();
-            Height = 500;
+            Height = Properties.Settings.Default.Height;
             Width = Screen.PrimaryScreen.Bounds.Width;
-            Controls.Add(CreateNewTerminal());
+            var terminal = CreateNewTerminal();
+            Controls.Add(terminal);
             ControlRemoved += new ControlEventHandler(TerminalRemoved);
         }
 
@@ -39,7 +42,7 @@ namespace QuakeConsole
         {
             if (Controls.Count == 0)
             {
-                Application.Exit();
+                Close();
             }
         }
         
@@ -116,7 +119,7 @@ namespace QuakeConsole
                 container.Panel1.Controls.Add(FocusedTerminal);
                 var terminal = CreateNewTerminal();
                 container.Panel2.Controls.Add(terminal);
-                terminal.FocusTerminal();
+                terminal.HasFocus = true;
             }
         }
 
@@ -144,6 +147,5 @@ namespace QuakeConsole
             var terminal = (QuakeTerminal)Controls[0];
             terminal.FocusTerminal();
         }
-
     }
 }

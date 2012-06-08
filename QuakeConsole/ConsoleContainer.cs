@@ -26,9 +26,10 @@ namespace QuakeConsole
             if (count == 1)
             {
                 var panel = Panel1.Controls.Count == 1 ? Panel1 : Panel2;
-                var terminal = panel.Controls[0];
+                var terminal = (QuakeTerminal) panel.Controls[0];
                 panel.Controls.RemoveAt(0);
                 Parent.Controls.Add(terminal);
+                terminal.FocusTerminal();
                 Parent.Controls.Remove(this);
             }               
         }

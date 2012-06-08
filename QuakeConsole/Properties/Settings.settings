@@ -17,5 +17,8 @@
     <Setting Name="CaptionBackgroundColor" Type="System.String" Scope="User">
       <Value Profile="(Default)">#aaaaaa</Value>
     </Setting>
+    <Setting Name="Height" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">500</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

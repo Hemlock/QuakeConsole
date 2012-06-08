@@ -108,11 +108,12 @@ namespace QuakeConsole
             TerminalBlurred,
             TerminalFocused;
 
-        public bool HasFocus = false;
+        private bool _HasFocus = false;
 
         public delegate void WinEventDelegate(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime);
         WinEventDelegate WindowsEventDelegate;
         IntPtr WindowsEventHook;
+        EventHandler ApplicationExitedHandler;
 
         public QuakeTerminal() : base()
         {
@@ -123,7 +124,9 @@ namespace QuakeConsole
             Margin = new Padding(0);
             Resize += (object sender, EventArgs e) => Redraw();
             VisibleChanged += (object sender, EventArgs e) => Redraw();
-            Application.ApplicationExit += (object sender, EventArgs e) => Cleanup();
+
+            ApplicationExitedHandler = new EventHandler(ApplicationExited);
+            Application.ApplicationExit += ApplicationExitedHandler;
 
             // setup up the hook to watch for all EVENT_SYSTEM_FOREGROUND events system wide
             WindowsEventDelegate = new WinEventDelegate(WinEventProc);
@@ -131,13 +134,9 @@ namespace QuakeConsole
                 IntPtr.Zero, WindowsEventDelegate, 0, 0, WINEVENT_OUTOFCONTEXT);
         }
 
-        private void Cleanup()
+        void ApplicationExited(object sender, EventArgs e)
         {
-            if (!TerminalProcess.HasExited)
-            {
-                TerminalProcess.Close();
-                TerminalProcess.WaitForExit(1000);
-            }
+            ExitTerminal();
         }
         
         private void Start()
@@ -146,6 +145,10 @@ namespace QuakeConsole
             startInfo.Arguments = " - ";
             startInfo.WorkingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             startInfo.LoadUserProfile = true;
+            startInfo.RedirectStandardOutput = false;
+            startInfo.RedirectStandardError = false;
+            startInfo.UseShellExecute = false;
+
             TerminalProcess = Process.Start(startInfo);
             TerminalProcess.EnableRaisingEvents = true;
             TerminalProcess.Exited +=
@@ -155,15 +158,24 @@ namespace QuakeConsole
         
         public void FocusTerminal()
         {
-            SetForegroundWindow(ChildHandle);
+            if (GetForegroundWindow() != ChildHandle)
+            {
+                SetForegroundWindow(ChildHandle);
+            }
+            HasFocus = true;
         }
 
         public void ExitTerminal()
         {
+            Debug.WriteLine("Exited: {0}", TerminalProcess.HasExited);
             if (!TerminalProcess.HasExited)
             {
+                Debug.WriteLine("Closing");
                 TerminalProcess.CloseMainWindow();
+                Debug.WriteLine("Waiting");
                 TerminalProcess.WaitForExit(1000);
+                Debug.WriteLine("OK!");
+                Application.ApplicationExit -= ApplicationExitedHandler;
             }
         }
         
@@ -211,7 +223,7 @@ namespace QuakeConsole
             bool isThis = (hwnd == ChildHandle);
             if (eventType == EVENT_SYSTEM_FOREGROUND)
             {
-                SetHasFocus(isThis);
+                HasFocus = isThis;
             }
             else if (isThis && eventType == EVENT_OBJECT_NAMECHANGE)
             {
@@ -227,22 +239,31 @@ namespace QuakeConsole
             Caption = stringBuilder.ToString();
         }
 
-        public void SetHasFocus(bool hasFocus)
+        public bool HasFocus
         {
-            HasFocus = hasFocus;
-            var settings = Properties.Settings.Default;
-            if (hasFocus)
+            get 
             {
-
-                BackColor = ColorTranslator.FromHtml(settings.FocusedCaptionBackgroundColor);
-                CaptionColor = ColorTranslator.FromHtml(settings.FocusedCaptionColor);
-                TerminalFocused(this, new EventArgs());
+                return _HasFocus;
             }
-            else
+
+            set
             {
-                BackColor = ColorTranslator.FromHtml(settings.CaptionBackgroundColor);
-                CaptionColor = ColorTranslator.FromHtml(settings.CaptionColor);
-                TerminalBlurred(this, new EventArgs());
+                _HasFocus = value;
+                var settings = Properties.Settings.Default;
+                var e = new EventArgs();
+                if (value)
+                {
+                    TerminalFocused(this, e);
+                    BackColor = ColorTranslator.FromHtml(settings.FocusedCaptionBackgroundColor);
+                    CaptionColor = ColorTranslator.FromHtml(settings.FocusedCaptionColor);
+                }
+                else
+                {
+                    TerminalBlurred(this, e);
+                    BackColor = ColorTranslator.FromHtml(settings.CaptionBackgroundColor);
+                    CaptionColor = ColorTranslator.FromHtml(settings.CaptionColor);
+                }
+
             }
         }
 
