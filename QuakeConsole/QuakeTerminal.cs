@@ -158,10 +158,8 @@ namespace QuakeConsole
         
         public void FocusTerminal()
         {
-            Debug.WriteLine("Focus Terminal");
             if (GetForegroundWindow() != ChildHandle)
             {
-                Debug.WriteLine("Setting Focus");
                 SetForegroundWindow(ChildHandle);
             }
             HasFocus = true;
@@ -169,14 +167,10 @@ namespace QuakeConsole
 
         public void ExitTerminal()
         {
-            Debug.WriteLine("Exited: {0}", TerminalProcess.HasExited);
             if (!TerminalProcess.HasExited)
             {
-                Debug.WriteLine("Closing");
                 TerminalProcess.CloseMainWindow();
-                Debug.WriteLine("Waiting");
                 TerminalProcess.WaitForExit(1000);
-                Debug.WriteLine("OK!");
                 Application.ApplicationExit -= ApplicationExitedHandler;
             }
         }
@@ -250,7 +244,6 @@ namespace QuakeConsole
 
             set
             {
-                Debug.WriteLine("HasFocus: {0} => {1}", _HasFocus, value);
                 _HasFocus = value;
                 var settings = Properties.Settings.Default;
                 var e = new EventArgs();

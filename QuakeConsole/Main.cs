@@ -36,6 +36,8 @@ namespace QuakeConsole
             var terminal = CreateNewTerminal();
             Controls.Add(terminal);
             ControlRemoved += new ControlEventHandler(TerminalRemoved);
+
+            Padding = new Padding(0, 0, 0, 3);
         }
 
         void TerminalRemoved(object sender, ControlEventArgs e)
@@ -147,5 +149,6 @@ namespace QuakeConsole
             var terminal = (QuakeTerminal)Controls[0];
             terminal.FocusTerminal();
         }
+
     }
 }
