@@ -5,20 +5,20 @@
     <Setting Name="Executable" Type="System.String" Scope="User">
       <Value Profile="(Default)">c:\cygwin\bin\mintty.exe</Value>
     </Setting>
-    <Setting Name="FocusedCaptionColor" Type="System.String" Scope="User">
-      <Value Profile="(Default)">#ffffff</Value>
-    </Setting>
-    <Setting Name="CaptionColor" Type="System.String" Scope="User">
-      <Value Profile="(Default)">#000000</Value>
-    </Setting>
-    <Setting Name="FocusedCaptionBackgroundColor" Type="System.String" Scope="User">
-      <Value Profile="(Default)">#3333ff</Value>
-    </Setting>
-    <Setting Name="CaptionBackgroundColor" Type="System.String" Scope="User">
-      <Value Profile="(Default)">#aaaaaa</Value>
-    </Setting>
     <Setting Name="Height" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">500</Value>
+    </Setting>
+    <Setting Name="FocusedCaptionColor" Type="System.String" Scope="User">
+      <Value Profile="(Default)">HighlightText</Value>
+    </Setting>
+    <Setting Name="CaptionColor" Type="System.String" Scope="User">
+      <Value Profile="(Default)">InactiveCaptionText</Value>
+    </Setting>
+    <Setting Name="FocusedCaptionBackgroundColor" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Highlight</Value>
+    </Setting>
+    <Setting Name="CaptionBackgroundColor" Type="System.String" Scope="User">
+      <Value Profile="(Default)">InactiveCaption</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -37,7 +37,19 @@ namespace QuakeConsole.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("#ffffff")]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        public int Height {
+            get {
+                return ((int)(this["Height"]));
+            }
+            set {
+                this["Height"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("HighlightText")]
         public string FocusedCaptionColor {
             get {
                 return ((string)(this["FocusedCaptionColor"]));
@@ -49,7 +61,7 @@ namespace QuakeConsole.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("#000000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("InactiveCaptionText")]
         public string CaptionColor {
             get {
                 return ((string)(this["CaptionColor"]));
@@ -61,7 +73,7 @@ namespace QuakeConsole.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("#3333ff")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Highlight")]
         public string FocusedCaptionBackgroundColor {
             get {
                 return ((string)(this["FocusedCaptionBackgroundColor"]));
@@ -73,25 +85,13 @@ namespace QuakeConsole.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("#aaaaaa")]
+        [global::System.Configuration.DefaultSettingValueAttribute("InactiveCaption")]
         public string CaptionBackgroundColor {
             get {
                 return ((string)(this["CaptionBackgroundColor"]));
             }
             set {
                 this["CaptionBackgroundColor"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("500")]
-        public int Height {
-            get {
-                return ((int)(this["Height"]));
-            }
-            set {
-                this["Height"] = value;
             }
         }
     }

@@ -70,7 +70,7 @@ namespace QuakeConsole
             }
         }
         
-        void RefocusLastFocusedTerminal()
+        public void RefocusLastFocusedTerminal()
         {
             if (LastFocusedTerminal != null && LastFocusedTerminal != FocusedTerminal)
             {
@@ -146,6 +146,7 @@ namespace QuakeConsole
             {
                 var parent = FocusedTerminal.Parent;
                 var container = new ConsoleContainer(orientation);
+                
                 parent.Controls.Add(container);
                 parent.Controls.Remove(FocusedTerminal);
                 container.Panel1.Controls.Add(FocusedTerminal);
