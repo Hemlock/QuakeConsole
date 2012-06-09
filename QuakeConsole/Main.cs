@@ -39,6 +39,28 @@ namespace QuakeConsole
 
             Padding = new Padding(0, 0, 0, 3);
         }
+        
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_NCHITTEST = 0x84;
+            const int HTBOTTOM = 15;
+
+            if (m.Msg == WM_NCHITTEST)
+            {
+                int x = (int)(m.LParam.ToInt64() & 0xFFFF);
+                int y = (int)((m.LParam.ToInt64() & 0xFFFF0000) >> 16);
+                Point pt = PointToClient(new Point(x, y));
+                Size clientSize = ClientSize;
+
+                if ( pt.Y >= ClientSize.Height - Padding.Bottom && ClientSize.Height >= Padding.Bottom)
+                {
+                    m.Result = (IntPtr)HTBOTTOM;
+                    RefocusLastFocusedTerminal();
+                    return;
+                }
+            }
+            base.WndProc(ref m);
+        }
 
         void TerminalRemoved(object sender, ControlEventArgs e)
         {
@@ -48,6 +70,14 @@ namespace QuakeConsole
             }
         }
         
+        void RefocusLastFocusedTerminal()
+        {
+            if (LastFocusedTerminal != null && LastFocusedTerminal != FocusedTerminal)
+            {
+                LastFocusedTerminal.FocusTerminal();
+            }
+        }
+
         QuakeTerminal CreateNewTerminal()
         {
             var terminal = new QuakeTerminal();
@@ -137,9 +167,7 @@ namespace QuakeConsole
         {
             if (Visible)
             {
-                if (LastFocusedTerminal != null) {
-                    LastFocusedTerminal.FocusTerminal();
-                }
+                RefocusLastFocusedTerminal();
             }
 
         }
