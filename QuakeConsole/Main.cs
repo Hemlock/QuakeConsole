@@ -37,7 +37,7 @@ namespace QuakeConsole
             Controls.Add(terminal);
             ControlRemoved += new ControlEventHandler(TerminalRemoved);
 
-            Padding = new Padding(0, 0, 0, 3);
+            Padding = new Padding(0, 0, 0, 4);
         }
         
         protected override void WndProc(ref Message m)
