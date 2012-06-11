@@ -5,3 +5,4 @@ pkg
 **/*.suo
 */bin
 */obj
+.gitconfig
