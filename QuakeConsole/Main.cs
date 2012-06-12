@@ -32,6 +32,7 @@ namespace QuakeConsole
     
             InitializeComponent();
             Height = Properties.Settings.Default.Height;
+            Opacity = Properties.Settings.Default.Opacity;
             Width = Screen.PrimaryScreen.Bounds.Width;
             var terminal = CreateNewTerminal();
             Controls.Add(terminal);

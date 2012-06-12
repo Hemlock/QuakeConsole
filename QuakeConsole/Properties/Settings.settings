@@ -20,5 +20,8 @@
     <Setting Name="CaptionBackgroundColor" Type="System.String" Scope="User">
       <Value Profile="(Default)">InactiveCaption</Value>
     </Setting>
+    <Setting Name="Opacity" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.85</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
