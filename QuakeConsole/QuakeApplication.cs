@@ -140,8 +140,10 @@ namespace QuakeConsole
             var list = new ListView();
             list.Dock = DockStyle.Fill;
             list.Items.Clear();
-            list.Columns.Clear();
-            list.Columns.Add("Name", "Command Line", 0).AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
+            list.Columns.Clear();            
+            list.Columns.Add("Name", 0).AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
+            list.Columns.Add("Executable", 0).AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
+            list.Columns.Add("Arguments", 0).AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
             list.LargeImageList = new ImageList();
             list.LargeImageList.ImageSize = new Size(32, 32);
             
