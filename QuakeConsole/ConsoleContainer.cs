@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace QuakeConsole
 {
-    class ConsoleContainer : SplitContainer, FocusableTerminal
+    class ConsoleContainer : SplitContainer, FocusableApplication
     {
 
         // Temp variable to store a previously focused control
@@ -15,8 +15,8 @@ namespace QuakeConsole
         public ConsoleContainer(Orientation orientation)
             : base()
         {
-            Panel1.ControlRemoved += new ControlEventHandler(TerminalRemoved);
-            Panel2.ControlRemoved += new ControlEventHandler(TerminalRemoved);
+            Panel1.ControlRemoved += new ControlEventHandler(ApplicationRemoved);
+            Panel2.ControlRemoved += new ControlEventHandler(ApplicationRemoved);
 
             Dock = DockStyle.Fill;
 
@@ -27,30 +27,30 @@ namespace QuakeConsole
             MouseUp += new MouseEventHandler(OnMouseUp);
         }
 
-        void TerminalRemoved(object sender, ControlEventArgs e)
+        void ApplicationRemoved(object sender, ControlEventArgs e)
         {
             var count = Panel1.Controls.Count + Panel2.Controls.Count;
             if (count == 1)
             {
                 var panel = Panel1.Controls.Count == 1 ? Panel1 : Panel2;
-                var terminal = (FocusableTerminal)panel.Controls[0];
+                var application = (FocusableApplication)panel.Controls[0];
                 panel.Controls.RemoveAt(0);
-                Parent.Controls.Add((Control)terminal);
-                terminal.FocusTerminal();
+                Parent.Controls.Add((Control)application);
+                application.FocusApplication();
                 Parent.Controls.Remove(this);
             }
         }
 
-        public void FocusTerminal()
+        public void FocusApplication()
         {
-            var terminal = (QuakeTerminal)Panel1.Controls[0];
-            terminal.FocusTerminal();
+            var application = (QuakeApplication)Panel1.Controls[0];
+            application.FocusApplication();
         }
 
         private void OnMouseUp(object sender, MouseEventArgs e)
         {
             var main = (QuakeConsole.Main) Application.OpenForms[0];
-            main.RefocusLastFocusedTerminal();
+            main.RefocusLastFocusedApplication();
         }
     }
 }

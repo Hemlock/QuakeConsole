@@ -23,5 +23,12 @@
     <Setting Name="Opacity" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0.85</Value>
     </Setting>
+    <Setting Name="Applications" Type="System.Collections.Specialized.StringCollection" Scope="User">
+      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;string&gt;MinTTY,c:\cygwin\bin\mintty.exe, - &lt;/string&gt;
+  &lt;string&gt;Chrome,C:\Users\sdeming\AppData\Local\Google\Chrome\Application\chrome.exe,&lt;/string&gt;
+&lt;/ArrayOfString&gt;</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
